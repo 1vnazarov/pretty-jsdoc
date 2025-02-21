@@ -3,6 +3,16 @@ import * as vscode from 'vscode';
 export function activate(context: vscode.ExtensionContext) {
     const log = vscode.window.createOutputChannel('pretty-jsdoc');
 
+    function getColor(color: string) {
+        return /^#([A-Fa-f0-9]{3,4}|[A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$/
+        .test(color) ? color : new vscode.ThemeColor(color);
+    }
+
+    function getConfig(key: string) {
+        const config = vscode.workspace.getConfiguration('pretty-jsdoc');
+        return config.get(key, config.inspect(key)!.defaultValue as any);
+    }
+
     let currentSyntaxDecoration: vscode.TextEditorDecorationType;
     let currentBackgroundDecoration: vscode.TextEditorDecorationType;
     let isEnabled = false;
@@ -17,12 +27,15 @@ export function activate(context: vscode.ExtensionContext) {
             currentBackgroundDecoration.dispose();
         }
 
-        currentSyntaxDecoration = vscode.window.createTextEditorDecorationType({
-            opacity: '0'
-        });
+        if (getConfig('hideSyntax')) {
+            currentSyntaxDecoration = vscode.window.createTextEditorDecorationType({
+                opacity: '0'
+            });
+        }
 
         currentBackgroundDecoration = vscode.window.createTextEditorDecorationType({
-            backgroundColor: new vscode.ThemeColor('editor.lineHighlightBackground'),
+            backgroundColor: getColor(getConfig('backgroundColor')),
+            color: getColor(getConfig('textColor')),
             isWholeLine: true,
         });
 
@@ -81,7 +94,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
     });
 
-    let toggleDisposable = vscode.commands.registerCommand('pretty-jsdoc.toggle', () => {
+    const toggleDisposable = vscode.commands.registerCommand('pretty-jsdoc.toggle', () => {
         isEnabled = !isEnabled;
         const editor = vscode.window.activeTextEditor;
         if (!editor) return;
@@ -97,12 +110,23 @@ export function activate(context: vscode.ExtensionContext) {
             }
         }
     });
+    
+    const configurationChangeListener = vscode.workspace.onDidChangeConfiguration(event => {
+        if (event.affectsConfiguration('pretty-jsdoc')) {
+            const editor = vscode.window.activeTextEditor;
+            if (editor) {
+                updateDecorations(editor);
+            }
+        }
+    });
 
     context.subscriptions.push(
         toggleDisposable,
         changeDocumentSubscription,
-        changeEditorSubscription
+        changeEditorSubscription,
+        configurationChangeListener
     );
+
     vscode.commands.executeCommand('pretty-jsdoc.toggle');
 }
 

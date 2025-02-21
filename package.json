@@ -20,7 +20,27 @@
         "command": "pretty-jsdoc.toggle",
         "title": "Toggle Pretty JSDoc"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Pretty JSDoc",
+      "properties": {
+        "pretty-jsdoc.backgroundColor": {
+          "type": "string",
+          "default": "editor.lineHighlightBackground",
+          "description": "Цвет фона для JSDoc (имя цвета темы VS Code или HEX)"
+        },
+        "pretty-jsdoc.textColor": {
+          "type": "string",
+          "default": "editor.foreground",
+          "description": "Цвет текста для JSDoc (имя цвета темы VS Code или HEX)"
+        },
+        "pretty-jsdoc.hideSyntax": {
+          "type": "boolean",
+          "default": true,
+          "description": "Скрывать синтаксис JSDoc (/** и *)"
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
