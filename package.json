@@ -3,11 +3,21 @@
   "displayName": "pretty jsdoc",
   "description": "jsodc visual highlighting",
   "version": "0.0.1",
+  "homepage": "https://github.com/1vnazarov/pretty-jsdoc",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/1vnazarov/pretty-jsdoc"
+  },
+  "publisher": "vnazarov",
+  "author": {
+    "name": "Ivan Nazarov"
+  },
+  "license": "MIT",
   "engines": {
     "vscode": "^1.97.0"
   },
   "categories": [
-    "Other"
+    "Visualization"
   ],
   "activationEvents": [
     "onLanguage:javascript",
