@@ -9,13 +9,16 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onLanguage:javascript",
+    "onLanguage:typescript"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "pretty-jsdoc.helloWorld",
-        "title": "Hello World"
+        "command": "pretty-jsdoc.toggle",
+        "title": "Toggle Pretty JSDoc"
       }
     ]
   },
