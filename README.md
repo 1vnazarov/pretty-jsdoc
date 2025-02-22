@@ -10,10 +10,10 @@
 
 ## Установка
 
-1. Откройте Visual Studio Code.
-2. Перейдите в раздел расширений (Extensions) и найдите "Pretty JSDoc".
-3. Установите расширение.
-4. Перезагрузите Visual Studio Code.
+1. [Скачайте](https://github.com/1vnazarov/pretty-jsdoc/releases) расширение из релизов на GitHub.
+2. Откройте Visual Studio Code.
+3. Перейдите в раздел расширений (Extensions) и выберите пункт "Установка из VSIX...".
+4. Выберите скачанный файл.
 
 ## Использование
 
