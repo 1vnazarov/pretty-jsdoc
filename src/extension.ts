@@ -17,15 +17,18 @@ export function activate(context: vscode.ExtensionContext) {
     let currentBackgroundDecoration: vscode.TextEditorDecorationType;
     let isEnabled = false;
 
-    function updateDecorations(editor: vscode.TextEditor) {
-        if (!editor || !isEnabled) return;
-
+    function disposeDecorations() {
         if (currentSyntaxDecoration) {
             currentSyntaxDecoration.dispose();
         }
         if (currentBackgroundDecoration) {
             currentBackgroundDecoration.dispose();
         }
+    }
+
+    function updateDecorations(editor: vscode.TextEditor) {
+        if (!editor || !isEnabled) return;
+        disposeDecorations();
 
         if (getConfig('hideSyntax')) {
             currentSyntaxDecoration = vscode.window.createTextEditorDecorationType({
@@ -44,13 +47,57 @@ export function activate(context: vscode.ExtensionContext) {
         const backgroundDecorations: vscode.DecorationOptions[] = [];
         
         let isInJSDoc = false;
+        let isInString = false;
+        let isInRegex = false;
+        let stringDelimiter = '';
 
         for (let i = 0; i < document.lineCount; i++) {
             const line = document.lineAt(i);
             const text = line.text;
 
-            if (text.includes('/**')) {
-                isInJSDoc = true;
+            for (let j = 0; j < text.length; j++) {
+                const char = text[j];
+
+                if (!isInString && !isInRegex && text.substring(j, j + 3) === '/**') {
+                    isInJSDoc = true;
+                    j += 2;
+                }
+
+                if (!isInString && !isInRegex && text.substring(j, j + 2) === '*/' && isInJSDoc) {
+                    isInJSDoc = false;
+                    j += 1;
+
+                    // Добавляем закрывающий комментарий в диапазон для декорирования
+                    const range = new vscode.Range(
+                        new vscode.Position(i, j - 1),
+                        new vscode.Position(i, j + 1)
+                    );
+                    syntaxDecorations.push({ range });
+                    backgroundDecorations.push({ range });
+                }
+
+                if (!isInRegex && (char === '"' || char === "'" || char === '`')) {
+                    if (!isInString) {
+                        isInString = true;
+                        stringDelimiter = char;
+                    }
+                    else if (char === stringDelimiter) {
+                        isInString = false;
+                        stringDelimiter = '';
+                    }
+                }
+
+                if (!isInString && char === '/' && text[j + 1] === '/') {
+                    break; // Пропускаем однострочные комментарии
+                }
+
+                if (!isInString && char === '/' && text[j + 1] !== '/' && text[j + 1] !== '*') {
+                    isInRegex = true;
+                }
+
+                if (isInRegex && char === '/' && text[j - 1] !== '\\') {
+                    isInRegex = false;
+                }
             }
 
             if (isInJSDoc) {
@@ -71,10 +118,6 @@ export function activate(context: vscode.ExtensionContext) {
                         });
                     });
                 }
-            }
-
-            if (text.includes('*/')) {
-                isInJSDoc = false;
             }
         }
 
@@ -102,12 +145,7 @@ export function activate(context: vscode.ExtensionContext) {
             updateDecorations(editor);
         }
         else {
-            if (currentSyntaxDecoration) {
-                currentSyntaxDecoration.dispose();
-            }
-            if (currentBackgroundDecoration) {
-                currentBackgroundDecoration.dispose();
-            }
+            disposeDecorations();
         }
     });
     
