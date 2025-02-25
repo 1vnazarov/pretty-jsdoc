@@ -2,7 +2,7 @@
   "name": "pretty-jsdoc",
   "displayName": "Pretty JSdoc",
   "description": "Расширение для более комфортного представления JSDoc в VS Code",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "homepage": "https://github.com/1vnazarov/pretty-jsdoc",
   "repository": {
     "type": "git",
