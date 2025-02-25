@@ -104,8 +104,8 @@ export function activate(context: vscode.ExtensionContext) {
                 backgroundDecorations.push({
                     range: line.range
                 });
-
-                const matches = text.match(/\/\*\*|\*\/|\s*\*\s/g);
+         
+                const matches = text.match(/\/\*\*|\*\/|\s*\*(?:\s|$)/g);
                 if (matches) {
                     matches.forEach(match => {
                         const startPos = text.indexOf(match);
@@ -113,9 +113,7 @@ export function activate(context: vscode.ExtensionContext) {
                             new vscode.Position(i, startPos),
                             new vscode.Position(i, startPos + match.length)
                         );
-                        syntaxDecorations.push({
-                            range: range
-                        });
+                        syntaxDecorations.push({ range });
                     });
                 }
             }
